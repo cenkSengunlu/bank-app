@@ -16,6 +16,12 @@ interface BankState {
   bank: BankType | null;
   bankError: string | null;
   bankStatus: string;
+  //  ----------- BANKA EKLE -----------
+  addBankError: string | null;
+  addBankStatus: string;
+  //  ----------- BANKA SİL -----------
+  deleteError: string | null;
+  deleteStatus: string;
 }
 
 const initialState: BankState = {
@@ -27,6 +33,12 @@ const initialState: BankState = {
   bank: null,
   bankStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   bankError: null,
+  //  ----------- BANKA EKLE -----------
+  addBankError: null,
+  addBankStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+  //  ----------- BANKA SİL -----------
+  deleteError: null,
+  deleteStatus: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
 };
 
 //  ----------- TÜM BANKALAR -----------
@@ -66,6 +78,7 @@ export const getBank: any = createAsyncThunk(
   }
 );
 
+//  ----------- BANKA EKLE -----------
 export const addBank: any = createAsyncThunk(
   "bank/addBank",
   async (bank_name: string) => {
@@ -86,6 +99,7 @@ export const addBank: any = createAsyncThunk(
   }
 );
 
+//  ----------- BANKA SİL -----------
 export const deleteBank: any = createAsyncThunk(
   "bank/deleteBank",
   async (bank_name: string) => {
@@ -111,28 +125,62 @@ const bankSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
-    builder;
-    // .addCase(loginUser.pending, (state) => {
-    //   state.status = "loading";
-    // })
-    // .addCase(loginUser.fulfilled, (state, action) => {
-    //   if (action.payload) {
-    //     state.status = "succeeded";
-    //     state.isLoggedIn = true;
-    //     state.user = action.payload;
-    //     localStorage.setItem("user", JSON.stringify(action.payload));
-    //   } else {
-    //     console.log("hata");
-    //     state.status = "failed";
-    //     state.isLoggedIn = false;
-    //     state.error = "Kullanıcı adı veya şifre hatalı";
-    //   }
-    // })
-    // .addCase(loginUser.rejected, (state, action) => {
-    //   console.log(action);
-    //   state.status = "failed";
-    //   state.error = action.error.message;
-    // });
+    builder
+      //  ----------- TÜM BANKALAR -----------
+      .addCase(getBanks.pending, (state) => {
+        state.getBanksStatus = "loading";
+      })
+      .addCase(getBanks.fulfilled, (state, action) => {
+        state.getBanksStatus = "succeeded";
+        state.banks = action.payload;
+      })
+      .addCase(getBanks.rejected, (state, action) => {
+        console.log(action);
+        state.getBanksStatus = "failed";
+        state.getBanksError = action.error.message;
+      })
+      //  ----------- TEK BANKA -----------
+      .addCase(getBank.pending, (state) => {
+        state.bankStatus = "loading";
+      })
+      .addCase(getBank.fulfilled, (state, action) => {
+        state.bankStatus = "succeeded";
+        state.bank = action.payload;
+      })
+      .addCase(getBank.rejected, (state, action) => {
+        console.log(action);
+        state.bankStatus = "failed";
+        state.bankError = action.error.message;
+      })
+      //  ----------- BANKA EKLE -----------
+      .addCase(addBank.pending, (state) => {
+        state.addBankStatus = "loading";
+      })
+      .addCase(addBank.fulfilled, (state, action) => {
+        state.addBankStatus = "succeeded";
+        if (action.payload) {
+          state.banks.push(action.payload.data);
+        }
+      })
+      .addCase(addBank.rejected, (state, action) => {
+        console.log(action);
+        state.addBankStatus = "failed";
+        state.addBankError = action.error.message;
+      })
+      //  ----------- BANKA SİL -----------
+      .addCase(deleteBank.pending, (state) => {
+        state.deleteStatus = "loading";
+      })
+      .addCase(deleteBank.fulfilled, (state, action) => {
+        state.deleteStatus = "succeeded";
+        const deletedBank = action.payload.data;
+        const banks = state.banks;
+        state.banks = banks.filter((bank) => bank.id !== deletedBank.id);
+      })
+      .addCase(deleteBank.rejected, (state, action) => {
+        state.deleteStatus = "failed";
+        state.deleteError = action.error.message;
+      });
   },
 });
 

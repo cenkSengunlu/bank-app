@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import FormData from "form-data";
 import axios from "axios";
 import { RootState } from "../../app/store";
-// import { LoggedInUser } from "../../app/type";
+import Cookies from "cookie";
 
 const POST_URL = "http://localhost:81/api/login";
 
@@ -21,7 +20,10 @@ const initialState: LoggedInUserState = {
   // user: {},
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
-  isLoggedIn: false,
+  isLoggedIn:
+    typeof window !== "undefined" && localStorage.getItem("user")
+      ? true
+      : false,
 };
 
 export const loginUser: any = createAsyncThunk(
@@ -48,7 +50,13 @@ export const loginUser: any = createAsyncThunk(
 const loginSlice = createSlice({
   name: "login",
   initialState,
-  reducers: {},
+  reducers: {
+    logoutUser(state) {
+      state.isLoggedIn = false;
+      state.user = {};
+      localStorage.removeItem("user");
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(loginUser.pending, (state) => {

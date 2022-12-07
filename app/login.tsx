@@ -9,8 +9,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "./hooks";
 import { loginUser, loginStatus } from "../slices/login/loginSlice";
+import { useRouter } from "next/router";
 
 const login = () => {
   const dispatch = useAppDispatch();
@@ -21,6 +22,8 @@ const login = () => {
   const [inputType, setInputType] = useState<string>("password");
   const [show, setShow] = useState<boolean>(false);
   const { isOpen, onToggle, onClose } = useDisclosure();
+
+  const router = useRouter();
 
   const onUsernameChanged = (e: React.FormEvent<HTMLInputElement>) =>
     setUsername(e.currentTarget.value);
