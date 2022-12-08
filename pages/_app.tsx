@@ -4,7 +4,7 @@ import { store } from "../app/store";
 import { Provider } from "react-redux";
 import { ChakraProvider } from "@chakra-ui/react";
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <ChakraProvider>
       <Provider store={store}>

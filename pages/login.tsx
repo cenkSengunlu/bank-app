@@ -9,9 +9,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "./hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { loginUser, loginStatus } from "../slices/login/loginSlice";
 import { useRouter } from "next/router";
+// import { signIn } from "next-auth/react";
 
 const login = () => {
   const dispatch = useAppDispatch();
@@ -46,6 +47,11 @@ const login = () => {
 
   useEffect(() => {
     if (status === "succeeded") {
+      // signIn("credentials", {
+      //   username: username,
+      //   password: password,
+      //   redirect: false,
+      // });
       setUsername("");
       setPassword("");
       // navigate("/");
