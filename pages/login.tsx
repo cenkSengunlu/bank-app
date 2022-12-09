@@ -1,16 +1,20 @@
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverHeader,
-  PopoverBody,
-  useDisclosure,
-} from "@chakra-ui/react";
+// import {
+//   Popover,
+//   PopoverTrigger,
+//   PopoverContent,
+//   PopoverArrow,
+//   PopoverCloseButton,
+//   PopoverHeader,
+//   PopoverBody,
+//   useDisclosure,
+// } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { loginUser, loginStatus } from "../slices/login/loginSlice";
+import {
+  loginUser,
+  loginStatus,
+  selectIsLoggedIn,
+} from "../slices/login/loginSlice";
 import { useRouter } from "next/router";
 // import { signIn } from "next-auth/react";
 
@@ -22,7 +26,8 @@ const login = () => {
   const [addRequestStatus, setAddRequestStatus] = useState<string>("idle");
   const [inputType, setInputType] = useState<string>("password");
   const [show, setShow] = useState<boolean>(false);
-  const { isOpen, onToggle, onClose } = useDisclosure();
+  // const { isOpen, onToggle, onClose } = useDisclosure();
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   const router = useRouter();
 
@@ -46,19 +51,20 @@ const login = () => {
   };
 
   useEffect(() => {
-    if (status === "succeeded") {
+    if (status === "succeeded" || isLoggedIn) {
       // signIn("credentials", {
       //   username: username,
       //   password: password,
       //   redirect: false,
       // });
+      router.push("/");
       setUsername("");
       setPassword("");
       // navigate("/");
     } else if (status === "failed") {
-      onToggle();
+      // onToggle();
     }
-  }, [status]);
+  }, [status, isLoggedIn]);
 
   useEffect(() => {
     if (show) {
@@ -121,22 +127,22 @@ const login = () => {
           </div>
 
           <div className="text-center lg:text-left">
-            <Popover
+            {/* <Popover
               returnFocusOnClose={false}
               isOpen={isOpen}
               onClose={onClose}
               placement="top"
               closeOnBlur={false}
             >
-              <PopoverTrigger>
-                <button
-                  type="submit"
-                  className="inline-block px-7 py-3 bg-blue-500 text-white font-medium text-sm leading-snug rounded shadow-md hover:bg-bg-blue-600 hover:shadow-lg focus:bg-bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out cursor-pointer"
-                  disabled={!canSave}
-                >
-                  Login
-                </button>
-              </PopoverTrigger>
+              <PopoverTrigger> */}
+            <button
+              type="submit"
+              className="inline-block px-7 py-3 bg-blue-500 text-white font-medium text-sm leading-snug rounded shadow-md hover:bg-bg-blue-600 hover:shadow-lg focus:bg-bg-blue-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out cursor-pointer"
+              disabled={!canSave}
+            >
+              Login
+            </button>
+            {/* </PopoverTrigger>
               <PopoverContent bg="red.500" color="white">
                 <PopoverArrow bg="red.500" />
                 <PopoverCloseButton />
@@ -145,7 +151,7 @@ const login = () => {
                   The email or password you entered is incorrect.
                 </PopoverBody>
               </PopoverContent>
-            </Popover>
+            </Popover> */}
           </div>
         </form>
       </div>

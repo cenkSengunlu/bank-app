@@ -1,30 +1,25 @@
-import axios from "axios";
+import axios from "../configs/axiosConfig";
 import React from "react";
-import BanksList from "../components/BanksList";
 import { BankType } from "../typings";
+import AccordionComp from "../components/AccordionComp";
 
 export async function getServerSideProps() {
-  const res = await axios({
-    method: "get",
-    url: "http://localhost:81/api/banks",
-    headers: {
-      authorization:
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzA0OTI5NzUsImxldmVsIjoxLCJ1c2VySWQiOjEsInVzZXJuYW1lIjoicHJveG9sYWIifQ.pZuiPWWNlDxGqFHytdSuM9utGAwuW8PZXOmGsfw3NBg",
-    },
-  }).catch((err) => {
-    // logine yolla redirection
-    return {
-      data: {
-        data: [],
-      },
-    };
-  });
-  console.log(res.data);
-  return {
-    props: {
-      banks: res.data,
-    },
-  };
+  return await axios
+    .get("banks")
+    .then((res) => {
+      return {
+        props: {
+          banks: res.data,
+        },
+      };
+    })
+    .catch((err) => {
+      return {
+        redirect: {
+          destination: "/login",
+        },
+      };
+    });
 }
 
 const banks = ({ banks }: any) => {
@@ -32,7 +27,7 @@ const banks = ({ banks }: any) => {
   return (
     <div>
       <h1>Bank List</h1>
-      <BanksList banks={banks.data} />
+      <AccordionComp banks={banks.data} />
     </div>
   );
 };

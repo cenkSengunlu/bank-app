@@ -1,29 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../../app/store";
-import Cookies from "cookie";
+import Cookies from "js-cookie";
 
 const POST_URL = "http://localhost:81/api/login";
 
 interface LoggedInUserState {
-  user: any;
+  user: string | unknown;
   error: string | null;
   status: string;
   isLoggedIn: boolean;
 }
 
 const initialState: LoggedInUserState = {
-  user:
-    typeof window !== "undefined" && localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user")!)
-      : {},
+  user: Cookies.get("user") !== undefined ? Cookies.get("user") : "",
   // user: {},
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
-  isLoggedIn:
-    typeof window !== "undefined" && localStorage.getItem("user")
-      ? true
-      : false,
+  isLoggedIn: Cookies.get("user") ? true : false,
 };
 
 export const loginUser: any = createAsyncThunk(
@@ -53,8 +47,8 @@ const loginSlice = createSlice({
   reducers: {
     logoutUser(state) {
       state.isLoggedIn = false;
-      state.user = {};
-      localStorage.removeItem("user");
+      state.user = "";
+      Cookies.remove("user");
     },
   },
   extraReducers(builder) {
@@ -66,8 +60,10 @@ const loginSlice = createSlice({
         if (action.payload) {
           state.status = "succeeded";
           state.isLoggedIn = true;
-          state.user = action.payload;
-          localStorage.setItem("user", JSON.stringify(action.payload));
+          console.log(action.payload.data);
+          state.user = action.payload.data;
+          Cookies.set("user", JSON.stringify(action.payload.data));
+          // localStorage.setItem("user", JSON.stringify(action.payload.data));
         } else {
           console.log("hata");
           state.status = "failed";
@@ -86,5 +82,7 @@ const loginSlice = createSlice({
 export const selectLoggedInUser = (state: RootState) => state.login.user;
 export const selectIsLoggedIn = (state: RootState) => state.login.isLoggedIn;
 export const loginStatus = (state: RootState) => state.login.status;
+
+export const { logoutUser } = loginSlice.actions;
 
 export default loginSlice.reducer;
