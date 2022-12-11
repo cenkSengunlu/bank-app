@@ -1,14 +1,14 @@
 import React from "react";
 import { useAppSelector } from "../app/hooks";
 import Header from "../components/Header";
-import { selectLoggedInUser } from "../slices/login/loginSlice";
 
 const Home = () => {
-  const user = useAppSelector(selectLoggedInUser);
-  console.log(user);
   return (
     <>
       <Header />
+      <div className="w-full h-full bg-green-500 flex justify-center items-center mt-12">
+        <div className="text-xl font-bold text-white py-5">Ana Sayfa</div>
+      </div>
     </>
   );
 };

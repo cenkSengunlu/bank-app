@@ -2,13 +2,12 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Router from "next/router";
 
+const token = Cookies.get("token");
 const instance = axios.create({
   baseURL: "http://localhost:81/api/",
   timeout: 1000,
   headers: {
-    authorization:
-      "Bearer " +
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzA1NzA4MzMsImxldmVsIjoxLCJ1c2VySWQiOjEsInVzZXJuYW1lIjoicHJveG9sYWIifQ.iSHbFFl9xSDtsHz_BdeolHx5zM2Bd1ANX1f8eMw7lS0cart",
+    authorization: `Bearer ${token}`,
   },
 });
 
@@ -16,7 +15,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
-    console.log(config);
     return config;
   },
   function (error) {
@@ -36,7 +34,7 @@ instance.interceptors.response.use(
     return response;
   },
   function (error) {
-    // if (typeof window !== "undefined" && error.response?.status !== 200) {
+    // if (typeof window !== "undefined" && error.response?.status === 500) {
     //   window.location.href = "/login";
     // }
 

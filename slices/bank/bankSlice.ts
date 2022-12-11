@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import FormData from "form-data";
-import axios from "axios";
+import axios from "../../configs/axiosConfig";
 import { RootState } from "../../app/store";
 import { BankType } from "../../app/type";
-// import { LoggedInUser } from "../../app/type";
+import Router from "next/router";
 
 const POST_URL = "http://localhost:81/api/bank";
 
@@ -42,39 +42,38 @@ const initialState: BankState = {
 };
 
 //  ----------- TÜM BANKALAR -----------
-export const getBanks: any = createAsyncThunk("bank/getBanks", async () => {
-  const response = await axios({
-    method: "get",
-    url: POST_URL,
-  })
-    .then(function (response) {
-      console.log(JSON.parse(response.request.response));
-      return JSON.parse(response.request.response);
-    })
-    .catch(function (err) {
-      console.log(err.message);
-    });
+// export const getBanks: any = createAsyncThunk("bank/getBanks", async () => {
+//   const response = await axios({
+//     method: "get",
+//     url: POST_URL,
+//   })
+//     .then(function (response) {
+//       console.log(JSON.parse(response.request.response));
+//       return JSON.parse(response.request.response);
+//     })
+//     .catch(function (err) {
+//       console.log(err.message);
+//     });
 
-  return response;
-});
+//   return response;
+// });
 
 //  ----------- TEK BANKA -----------
 export const getBank: any = createAsyncThunk(
   "bank/getBank",
   async (bank_id: number) => {
-    const response = await axios({
-      method: "get",
-      url: POST_URL + `${bank_id}`,
-    })
-      .then(function (response) {
-        console.log(JSON.parse(response.request.response));
-        return JSON.parse(response.request.response);
+    return await axios
+      .post(`banks/${bank_id}`)
+      .then((res) => {
+        return res.data;
       })
-      .catch(function (err) {
-        console.log(err.message);
+      .catch((err) => {
+        return {
+          redirect: {
+            destination: "/login",
+          },
+        };
       });
-
-    return response;
   }
 );
 
@@ -82,20 +81,30 @@ export const getBank: any = createAsyncThunk(
 export const addBank: any = createAsyncThunk(
   "bank/addBank",
   async (bank_name: string) => {
-    const response = await axios({
-      method: "post",
-      url: POST_URL,
-      data: { bank_name: bank_name },
-    })
-      .then(function (response) {
-        console.log(JSON.parse(response.request.response));
-        return JSON.parse(response.request.response);
+    return await axios
+      .post("banks/", { bank_name: bank_name })
+      .then((res) => {
+        return res.data;
       })
-      .catch(function (err) {
-        console.log(err.message);
+      .catch((err) => {
+        return {
+          redirect: {
+            destination: "/login",
+          },
+        };
       });
+    // const response = await axios
+    //   .post("banks", { bank_name: bank_name })
+    //   .then(function (response) {
+    //     // console.log(JSON.parse(response.request.response));
+    //     return JSON.parse(response.request.response);
+    //   })
+    //   .catch(function (err) {
+    //     Router.push("/login");
+    //     console.log(err.message);
+    //   });
 
-    return response;
+    // return response;
   }
 );
 
@@ -127,18 +136,18 @@ const bankSlice = createSlice({
   extraReducers(builder) {
     builder
       //  ----------- TÜM BANKALAR -----------
-      .addCase(getBanks.pending, (state) => {
-        state.getBanksStatus = "loading";
-      })
-      .addCase(getBanks.fulfilled, (state, action) => {
-        state.getBanksStatus = "succeeded";
-        state.banks = action.payload;
-      })
-      .addCase(getBanks.rejected, (state, action) => {
-        console.log(action);
-        state.getBanksStatus = "failed";
-        state.getBanksError = action.error.message;
-      })
+      // .addCase(getBanks.pending, (state) => {
+      //   state.getBanksStatus = "loading";
+      // })
+      // .addCase(getBanks.fulfilled, (state, action) => {
+      //   state.getBanksStatus = "succeeded";
+      //   state.banks = action.payload;
+      // })
+      // .addCase(getBanks.rejected, (state, action) => {
+      //   console.log(action);
+      //   state.getBanksStatus = "failed";
+      //   state.getBanksError = action.error.message;
+      // })
       //  ----------- TEK BANKA -----------
       .addCase(getBank.pending, (state) => {
         state.bankStatus = "loading";
@@ -149,6 +158,7 @@ const bankSlice = createSlice({
       })
       .addCase(getBank.rejected, (state, action) => {
         console.log(action);
+        // Router.push("/login");
         state.bankStatus = "failed";
         state.bankError = action.error.message;
       })
@@ -158,9 +168,13 @@ const bankSlice = createSlice({
       })
       .addCase(addBank.fulfilled, (state, action) => {
         state.addBankStatus = "succeeded";
-        if (action.payload) {
-          state.banks.push(action.payload.data);
-        }
+        const newBank = {
+          id: action.payload.data.id,
+          bank_name: action.payload.data.bank_name,
+          interests: [],
+        };
+        state.banks.push(newBank);
+        Router.replace(Router.asPath);
       })
       .addCase(addBank.rejected, (state, action) => {
         console.log(action);

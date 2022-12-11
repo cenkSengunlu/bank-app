@@ -6,38 +6,29 @@ import Cookies from "js-cookie";
 const POST_URL = "http://localhost:81/api/login";
 
 interface LoggedInUserState {
-  user: string | unknown;
   error: string | null;
   status: string;
-  isLoggedIn: boolean;
 }
 
 const initialState: LoggedInUserState = {
-  user: Cookies.get("user") !== undefined ? Cookies.get("user") : "",
-  // user: {},
   status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
   error: null,
-  isLoggedIn: Cookies.get("user") ? true : false,
 };
 
 export const loginUser: any = createAsyncThunk(
   "login/loginUser",
   async ({ username, password }: { username: string; password: string }) => {
-    const response = await axios({
+    return await axios({
       method: "post",
       url: POST_URL,
       data: { username: username, password: password },
-      // headers: { "Content-Type": "multipart/form-data" },
     })
       .then(function (response) {
-        console.log(JSON.parse(response.request.response));
-        return JSON.parse(response.request.response);
+        return response.data;
       })
       .catch(function (err) {
         console.log(err.message);
       });
-
-    return response;
   }
 );
 
@@ -45,10 +36,8 @@ const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
-    logoutUser(state) {
-      state.isLoggedIn = false;
-      state.user = "";
-      Cookies.remove("user");
+    logoutUser() {
+      Cookies.remove("token");
     },
   },
   extraReducers(builder) {
@@ -59,28 +48,19 @@ const loginSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         if (action.payload) {
           state.status = "succeeded";
-          state.isLoggedIn = true;
-          console.log(action.payload.data);
-          state.user = action.payload.data;
-          Cookies.set("user", JSON.stringify(action.payload.data));
-          // localStorage.setItem("user", JSON.stringify(action.payload.data));
+          Cookies.set("token", action.payload.data);
         } else {
-          console.log("hata");
           state.status = "failed";
-          state.isLoggedIn = false;
           state.error = "Kullanıcı adı veya şifre hatalı";
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
-        console.log(action);
         state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
 
-export const selectLoggedInUser = (state: RootState) => state.login.user;
-export const selectIsLoggedIn = (state: RootState) => state.login.isLoggedIn;
 export const loginStatus = (state: RootState) => state.login.status;
 
 export const { logoutUser } = loginSlice.actions;
