@@ -28,7 +28,7 @@ export async function getServerSideProps(test: any) {
       return {
         props: {
           banks: [],
-          error: err,
+          error: "hata",
         },
       };
     });

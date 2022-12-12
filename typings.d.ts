@@ -8,5 +8,5 @@ export interface InterestsType {
 export interface BankType {
   id: number;
   bank_name: string;
-  interests: InterestsType[] | null;
+  interests: InterestsType[];
 }

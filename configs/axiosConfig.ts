@@ -1,6 +1,5 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import Router from "next/router";
 
 const token = Cookies.get("token");
 const instance = axios.create({

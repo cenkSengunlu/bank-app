@@ -5,41 +5,49 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Router from "next/router";
-import Cookies from "js-cookie";
-
-export default function AlertDialog() {
-  const [open, setOpen] = React.useState(true);
-  const user = Cookies.get("token");
-
+import { useAppDispatch } from "../app/hooks";
+import { deleteBank } from "../slices/bank/bankSlice";
+export default function AlertDialog({
+  id,
+  bank_name,
+  isOpen,
+  setExpanded,
+  setIsOpen,
+}: {
+  id: number;
+  bank_name: string;
+  isOpen: boolean;
+  setExpanded: any;
+  setIsOpen: any;
+}) {
+  const dispatch = useAppDispatch();
   const handleClose = () => {
-    Cookies.remove("token");
-    Router.push("/login");
-    setOpen(false);
+    setIsOpen(false);
+  };
+
+  const handleDelete = () => {
+    dispatch(deleteBank(id));
+    setExpanded(false);
+    setIsOpen(false);
   };
 
   return (
     <div>
       <Dialog
-        open={open}
+        open={isOpen}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {user ? "Oturum Süresi Doldu" : "Sayfayı görüntülemek için giriş yap"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">Banka Sil</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {user
-              ? "Oturum Süresi Doldu"
-              : "Sayfayı görüntülemek için giriş yap"}
+            {bank_name} isimli bankayı sil!
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} autoFocus>
-            {user ? "Çıkış Yap" : "Giriş Yap"}
-          </Button>
+          <Button onClick={handleClose}>İptal</Button>
+          <Button onClick={handleDelete}>Sil</Button>
         </DialogActions>
       </Dialog>
     </div>
