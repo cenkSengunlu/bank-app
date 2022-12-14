@@ -9,9 +9,9 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <StyledEngineProvider>
       <Provider store={store}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        {/* <Layout> */}
+        <Component {...pageProps} />
+        {/* </Layout> */}
       </Provider>
     </StyledEngineProvider>
   );

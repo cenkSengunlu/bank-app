@@ -47,7 +47,17 @@ const banks = ({
   return (
     <div>
       <BankAdd />
-      <AccordionComp banks={banks.data} />
+      <div className="container mx-auto">
+        {banks.data.length !== 0 ? (
+          <div className="px-36">
+            <AccordionComp banks={banks.data} />
+          </div>
+        ) : (
+          <div className="w-full flex justify-center text-2xl font-semibold mt-5">
+            Herhangi bir banka bulunmamaktadır.
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -30,9 +30,9 @@ const BankAdd = () => {
   };
   return (
     <>
-      <div>
+      <div className="w-full flex justify-center">
         <div
-          className="py-1 px-4 w-36 flex justify-center items-center my-3 ml-3 cursor-pointer select-none bg-violet-500 border-2 border-violet-600 text-white font-bold text-lg rounded-lg"
+          className="py-1 px-4 w-36 flex justify-center items-center my-5 cursor-pointer select-none bg-smooth-pink shadow-md shadow-smooth-pink text-white font-semibold text-lg rounded-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
           onClick={handleClickOpen}
         >
           Banka Ekle

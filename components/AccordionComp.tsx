@@ -84,7 +84,7 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
   };
 
   return (
-    <div>
+    <div className="overflow-auto">
       {isOpen && selectedBank && (
         <DeleteModal
           id={selectedBank.id}

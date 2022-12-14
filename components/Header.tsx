@@ -9,10 +9,8 @@ const Header = () => {
     Router.push("/login");
   };
   return (
-    <header className="bg-blue-500 py-3 px-3 text-white flex justify-between items-center space-x-5">
+    <header className="bg-primary-purple py-3 px-3 text-white flex justify-between items-center space-x-5 font-semibold">
       <div className="flex items-center space-x-5">
-        <div className="select-none text-xl font-bold">Bank-App</div>
-
         <Link href="/">
           <div className="px-2 py-2 select-none hover:bg-light-white rounded-lg cursor-pointer text-center text-lg">
             Hesaplama

@@ -1,37 +1,41 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { selectActiveTab, setActiveTab } from "../slices/main/mainSlice";
+import { BankType } from "../typings";
 import CreditInterest from "./Interest/CreditInterest";
 import DepositInterest from "./Interest/DepositInterest";
 
-const CalculatePage = () => {
+const CalculatePage = ({ banks }: { banks: BankType[] }) => {
   const activeTab = useAppSelector(selectActiveTab);
   const dispatch = useAppDispatch();
+  const deposit = banks.filter((bank) =>
+    bank.interests.filter((interest) => interest.credit_type === 3)
+  );
+  console.log(deposit);
   return (
     <>
-      <div className="w-5/6 h-5/6 m-12 mb-12 pb-12 border-2 border-black rounded-lg">
-        <div className="w-full flex items-center space-x-5 h-14 bg-blue-500 rounded-t-lg pl-5">
+      <div className="w-full h-full">
+        <div className="flex select-none cursor-pointer ml-3 mt-3 h-14 items-end">
           <div
-            className="hover:bg-light-white rounded-lg select-none cursor-pointer p-2 w-32 text-center text-white font-bold"
+            className={`border border-b-0 border-smooth-gray py-1 px-3 font-semibold flex items-center justify-center w-36 ${
+              activeTab === "credit" ? "h-10 text-lg" : "h-8"
+            }`}
             onClick={() => dispatch(setActiveTab("credit"))}
           >
             Kredi Faizi
           </div>
           <div
-            className="hover:bg-light-white rounded-lg select-none cursor-pointer p-2 w-32 text-center text-white font-bold"
+            className={`border border-b-0 border-smooth-gray py-1 px-3 font-semibold flex items-center justify-center w-36 ${
+              activeTab === "deposit" ? "h-10 text-lg" : "h-8"
+            }`}
             onClick={() => dispatch(setActiveTab("deposit"))}
           >
             Mevduat Faizi
           </div>
         </div>
-        <div>
-          {activeTab === "credit" ? (
-            <CreditInterest />
-          ) : activeTab === "deposit" ? (
-            <DepositInterest />
-          ) : (
-            <div>Seçim yapmadınız</div>
-          )}
+        <hr />
+        <div className="container mx-auto">
+          {activeTab === "credit" ? <CreditInterest /> : <DepositInterest />}
         </div>
       </div>
     </>
