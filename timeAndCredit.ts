@@ -3,8 +3,8 @@ export const timeAndCredit = {
     id: 1,
     name: "Konut Kredisi",
     time: [
-      { id: 5, name: "5 Yıl", value: 5 },
-      { id: 10, name: "10 Yıl", value: 10 },
+      { id: 6, name: "5 Yıl", value: 6 },
+      { id: 7, name: "10 Yıl", value: 7 },
     ],
   },
   consumer: {

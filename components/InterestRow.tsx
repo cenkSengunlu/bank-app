@@ -1,139 +1,159 @@
 import React from "react";
 import { BankType, InterestsType } from "../typings";
+import { timeAndCredit } from "../timeAndCredit";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  selectBanks,
-  setInterest,
-  updateInterest,
-} from "../slices/bank/bankSlice";
-import { MenuItem, Select } from "@mui/material";
+import { addInterest } from "../slices/bank/bankSlice";
+import { FormControl, MenuItem, Select, TextField } from "@mui/material";
+import { useFieldArray } from "react-hook-form";
 
-const InterestRow = ({ interest, index }: { interest: any; index: number }) => {
+const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
   const dispatch = useAppDispatch();
-  const banks = useAppSelector(selectBanks);
-  const bank = banks.find((b) => b.id === interest.bank_id);
-  const otherInterests = bank?.interests.slice(0);
-  otherInterests?.splice(index, 1);
-
-  const disableCredit = (option: number) => {
-    return (
-      bank?.interests.filter(
-        (interest2: InterestsType) => interest2.time_option === option
-      ).length === 3 ||
-      otherInterests?.filter(
-        (otherInterests: InterestsType) =>
-          otherInterests.credit_type === interest.credit_type &&
-          otherInterests.time_option === option
-      ).length === 1
-    );
+  const list = timeAndCredit;
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `banks[${rowIndex}].interests`,
+  });
+  const handleAppend = () => {
+    append({
+      bank_id: bank.id,
+      interest: 0,
+      time_option: 0,
+      credit_type: 0,
+    });
   };
 
-  const disableTime = (option: number) => {
-    return (
-      bank?.interests.filter(
-        (interest2: InterestsType) => interest2.credit_type === option
-      ).length === 2 ||
-      otherInterests?.filter(
-        (otherInterest: InterestsType) =>
-          otherInterest.time_option === interest.time_option &&
-          otherInterest.credit_type === option
-      ).length === 2
-    );
-  };
-
-  const handleSave = () => {
-    // dispatch(addInterest({ interest }));
+  const handleSave = (index: number) => {
+    const interest = watch(`banks[${rowIndex}].interests[${index}]`);
+    console.log(interest);
+    dispatch(addInterest({ ...interest }));
   };
 
   return (
     <>
-      <Select
-        defaultValue={interest.credit_type}
-        onChange={(e) =>
-          dispatch(
-            updateInterest(
-              interest.bank_id,
-              { credit_type: Number(e.target.value) },
-              index
-            )
-          )
-        }
-        displayEmpty
-        inputProps={{ "aria-label": "Without label" }}
-      >
-        <MenuItem value={1} disabled={disableCredit(1)}>
-          Konut
-        </MenuItem>
-        <MenuItem value={2} disabled={disableCredit(2)}>
-          Tüketici
-        </MenuItem>
-        <MenuItem value={3} disabled={disableCredit(3)}>
-          Mevduat
-        </MenuItem>
-      </Select>
+      <div className="grid grid-cols-4 gap-5">
+        <div className="w-full flex justify-center items-center">Tür</div>
+        <div className="w-full flex justify-center items-center">Vade</div>
+        <div className="w-full flex justify-center items-center">
+          Aylık Faiz Oranı
+        </div>
+        <div className="w-full grid grid-cols-2 gap-1">
+          <button
+            disabled={fields.length === 7}
+            onClick={handleAppend}
+            className="cursor-pointer bg-blue-600 border-2 border-blue-700 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Faiz Ekle
+          </button>
+          <button
+            onClick={() => {
+              // handleDelete(bank);
+            }}
+            className="cursor-pointer bg-red-500 border-2 border-red-600 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm"
+          >
+            Bankayı Sil
+          </button>
+        </div>
+      </div>
+      <hr className="mt-3 mb-2" />
+      <div>
+        {fields.map((interest, index) => (
+          <div key={index} className="grid grid-cols-4 gap-5 items-center">
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+              <Select
+                displayEmpty
+                defaultValue={watch(
+                  `banks[${rowIndex}].interests[${index}].credit_type`
+                )}
+                {...register(
+                  `banks[${rowIndex}].interests[${index}].credit_type`,
+                  {
+                    required: "Kredi Tipi Seçiniz",
+                  }
+                )}
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                {Object.values(list).map((credit, credit_index) => {
+                  return (
+                    <MenuItem value={credit.id} key={credit_index}>
+                      {credit.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
 
-      <Select
-        defaultValue={interest.credit_type}
-        onChange={(e) =>
-          dispatch(
-            updateInterest(
-              interest.bank_id,
-              { credit_type: Number(e.target.value) },
-              index
-            )
-          )
-        }
-        displayEmpty
-        inputProps={{ "aria-label": "Without label" }}
-      >
-        <MenuItem value={1} disabled={disableCredit(1)}>
-          Konut
-        </MenuItem>
-        <MenuItem value={2} disabled={disableCredit(2)}>
-          Tüketici
-        </MenuItem>
-        <MenuItem value={3} disabled={disableCredit(3)}>
-          Mevduat
-        </MenuItem>
-      </Select>
-      <Select
-        defaultValue={interest.credit_type}
-        onChange={(e) =>
-          dispatch(
-            updateInterest(
-              interest.bank_id,
-              { credit_type: Number(e.target.value) },
-              index
-            )
-          )
-        }
-        displayEmpty
-        inputProps={{ "aria-label": "Without label" }}
-      >
-        <MenuItem value={1} disabled={disableCredit(1)}>
-          Konut
-        </MenuItem>
-        <MenuItem value={2} disabled={disableCredit(2)}>
-          Tüketici
-        </MenuItem>
-        <MenuItem value={3} disabled={disableCredit(3)}>
-          Mevduat
-        </MenuItem>
-      </Select>
-      <div className="w-full grid grid-cols-2 gap-2">
-        <button
-          className="w-full bg-green-500 border-2 border-green-600 rounded-lg disabled:cursor-not-allowed disabled:opacity-50"
-          // disabled={!canSave}
-          onClick={() => handleSave()}
-        >
-          Kaydet
-        </button>
-        <button
-          className="w-full bg-red-500 border-2 border-red-600 text-white rounded-lg"
-          // onClick={() => }
-        >
-          Sil
-        </button>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+              <Select
+                displayEmpty
+                defaultValue={watch(
+                  `banks[${rowIndex}].interests[${index}].time_option`
+                )}
+                {...register(
+                  `banks[${rowIndex}].interests[${index}].time_option`,
+                  {
+                    required: "Kredi Tipi Seçiniz",
+                  }
+                )}
+                inputProps={{ "aria-label": "Without label" }}
+                disabled={
+                  watch(
+                    `banks[${rowIndex}].interests[${index}].credit_type`
+                  ) === 0
+                }
+              >
+                {Object.values(list)
+                  .find(
+                    (item) =>
+                      item.id ===
+                      watch(
+                        `banks[${rowIndex}].interests[${index}].credit_type`
+                      )
+                  )
+                  ?.time.map((time, time_index) => {
+                    return (
+                      <MenuItem value={time.id} key={time_index}>
+                        {time.name}
+                      </MenuItem>
+                    );
+                  })}
+              </Select>
+            </FormControl>
+
+            <TextField
+              size="small"
+              id="outlined-basic"
+              variant="outlined"
+              {...register(`banks[${rowIndex}].interests[${index}].interest`, {
+                required: "Faiz Giriniz",
+              })}
+            />
+
+            <div className="w-full grid grid-cols-2 gap-1">
+              <button
+                disabled={
+                  bank.interests[index] ||
+                  watch(
+                    `banks[${rowIndex}].interests[${index}].credit_type`
+                  ) === 0 ||
+                  watch(
+                    `banks[${rowIndex}].interests[${index}].time_option`
+                  ) === 0 ||
+                  watch(`banks[${rowIndex}].interests[${index}].interest`) == 0
+                }
+                onClick={() => handleSave(index)}
+                className="cursor-pointer font-bold bg-green-600 border-2 border-green-700 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                KAYDET
+              </button>
+              <button
+                onClick={() => remove(index)}
+                className="cursor-pointer font-bold bg-red-500 border-2 border-red-600 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm"
+              >
+                SİL
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </>
   );

@@ -110,20 +110,14 @@ export const addInterest: any = createAsyncThunk(
     return await axios
       .post("interests/", {
         bank_id: bank_id,
-        interest: interest,
+        interest: Number(interest),
         time_option: time_option,
         credit_type: credit_type,
       })
       .then((res) => {
+        console.log(res.data);
         return res.data;
       });
-    // .catch((err) => {
-    //   return {
-    //     redirect: {
-    //       destination: "/login",
-    //     },
-    //   };
-    // });
   }
 );
 
@@ -145,61 +139,7 @@ export const deleteBank: any = createAsyncThunk(
 const bankSlice = createSlice({
   name: "bank",
   initialState,
-  reducers: {
-    setInterest: {
-      reducer(
-        state,
-        action: PayloadAction<{
-          bank: BankType;
-        }>
-      ) {
-        const { bank } = action.payload;
-        console.log(bank);
-        const banks = state.banks;
-        state.banks = banks.map((b) => (b.id === bank.id ? bank : b));
-        Router.replace(Router.asPath);
-      },
-      prepare(bank: BankType) {
-        return { payload: { bank } };
-      },
-    },
-
-    removeInterest: {
-      reducer(
-        state,
-        action: PayloadAction<{
-          bank: BankType;
-        }>
-      ) {
-        const { bank } = action.payload;
-        state.banks = state.banks.map((b) => (b.id === bank.id ? bank : b));
-        Router.replace(Router.asPath);
-      },
-      prepare(bank: BankType) {
-        return { payload: { bank } };
-      },
-    },
-
-    updateInterest: {
-      reducer(
-        state,
-        action: PayloadAction<{ id: number; obj: any; interest_index: number }>
-      ) {
-        const { id, obj, interest_index } = action.payload;
-        const bank = state.banks.find((bank) => bank.id === id);
-        if (bank) {
-          bank.interests[interest_index] = {
-            ...bank.interests[interest_index],
-            ...obj,
-          };
-        }
-        Router.replace(Router.asPath);
-      },
-      prepare(id: number, obj: any, interest_index) {
-        return { payload: { id, obj, interest_index } };
-      },
-    },
-  },
+  reducers: {},
   extraReducers(builder) {
     builder
       //  ----------- TÜM BANKALAR -----------
@@ -262,6 +202,33 @@ const bankSlice = createSlice({
       .addCase(deleteBank.rejected, (state, action) => {
         state.deleteStatus = "failed";
         state.deleteError = action.error.message;
+      })
+      //  ----------- INTEREST EKLE -----------
+      .addCase(addInterest.pending, (state) => {
+        state.addBankStatus = "loading";
+      })
+      .addCase(addInterest.fulfilled, (state, action) => {
+        state.addBankStatus = "succeeded";
+        const banks = state.banks;
+        const bank = banks.find(
+          (bank) => bank.id === action.payload.data.bank_id
+        );
+        if (bank) {
+          const newBank = {
+            id: bank.id,
+            bank_name: bank.bank_name,
+            interests: [...bank.interests, action.payload.data],
+          };
+          state.banks = banks.map((bank) =>
+            bank.id === newBank.id ? newBank : bank
+          );
+        }
+
+        Router.replace(Router.asPath);
+      })
+      .addCase(addInterest.rejected, (state, action) => {
+        state.addBankStatus = "failed";
+        state.addBankError = action.error.message;
       });
   },
 });
@@ -270,8 +237,5 @@ export const selectBank = (state: RootState) => state.bank.bank;
 export const bankStatus = (state: RootState) => state.bank.bankStatus;
 export const selectBanks = (state: RootState) => state.bank.banks;
 export const getBanksStatus = (state: RootState) => state.bank.getBanksStatus;
-
-export const { setInterest, updateInterest, removeInterest } =
-  bankSlice.actions;
 
 export default bankSlice.reducer;

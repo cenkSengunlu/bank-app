@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-__next {
+#__next {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh !important;
+}
+
+main {
+  height: 100%;
 }
