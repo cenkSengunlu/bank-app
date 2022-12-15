@@ -49,49 +49,34 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-export default function AccordionComp({ banks }: { banks: BankType[] }) {
+const DepositAccordion = ({
+  bank,
+  amount,
+  time,
+}: {
+  bank: BankType;
+  amount: number;
+  time: number;
+}) => {
   const [expanded, setExpanded] = useState<string | false>("");
-  const [selectedBank, setSelectedBank] = useState<BankType>();
-  const [isOpen, setIsOpen] = useState(false);
-  const dispatch = useAppDispatch();
-  const [interests, setInterests] = useState<any>();
-  const { control, register, watch, trigger } = useForm();
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "banks",
-  });
-
-  useEffect(() => {
-    if (watch("banks").length === 0) {
-      banks.forEach((bank) => {
-        append({
-          id: bank.id,
-          bank_name: bank.bank_name,
-          interests: bank.interests,
-        });
-      });
-    }
-  }, [append, banks, watch]);
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
       setExpanded(newExpanded ? panel : false);
     };
+  console.log(bank);
+
+  // filter banks by time
+  const filteredBanks = bank.interests.filter(
+    (interest) => interest.time_option === time
+  );
+  console.log(filteredBanks);
 
   return (
-    <div className="overflow-auto">
-      {isOpen && selectedBank && (
-        <DeleteModal
-          id={selectedBank.id}
-          bank_name={selectedBank.bank_name}
-          isOpen={isOpen}
-          setExpanded={setExpanded}
-          setIsOpen={setIsOpen}
-        />
-      )}
-      {fields.map((bank: any, index: number) => {
-        return (
-          <div key={index}>
+    <div className="w-4/6 mx-auto overflow-auto">
+      {bank.interests.map((interest, index) => {
+        if (interest.time_option === time) {
+          return (
             <Accordion
               expanded={expanded === `panel${index + 1}`}
               onChange={handleChange(`panel${index + 1}`)}
@@ -100,24 +85,41 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
                 aria-controls={`panel${index + 1}d-content`}
                 id="panel1d-header"
               >
-                <Typography>{bank.bank_name}</Typography>
+                <Typography>
+                  <div className="flex space-x-10">
+                    <div className="w-32">{bank.bank_name}</div>
+                    <div className="">
+                      Aylık Faiz Oranı %{interest.interest}
+                    </div>
+                  </div>
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <div>
-                  <InterestRow
-                    ban
-                    rowIndex={index}
-                    control={control}
-                    watch={watch}
-                    register={register}
-                    bank={banks[index]}
-                  />
+                <div className="w-full flex flex-col items-center">
+                  <div>Mevduat Tutarı: {amount}</div>
+                  <div>
+                    {time} ay vade sonra alınacak faiz tutarı:{" "}
+                    {(amount * interest.interest) / 100} TL
+                  </div>
+                  <div>
+                    {" "}
+                    {time} ay vade sonra toplam mevduat:{" "}
+                    {(amount * interest.interest) / 100 + amount} TL
+                  </div>
                 </div>
               </AccordionDetails>
             </Accordion>
-          </div>
-        );
+          );
+        }
       })}
+
+      {bank.interests.length === 0 && (
+        <div className="w-full flex justify-center text-2xl font-semibold mt-5">
+          Bu bankaya ait mevduat faizi bulunamadı.
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default DepositAccordion;
