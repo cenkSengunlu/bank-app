@@ -55,7 +55,7 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
   const [selectedBank, setSelectedBank] = useState<BankType>();
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useAppDispatch();
-  const [interests, setInterests] = useState<any>();
+
   const { control, register, watch, trigger } = useForm();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -99,10 +99,10 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
         />
       )}
 
-      <div>
+      <div className="mt-6">
         {fields.map((bank: any, index: number) => {
           return (
-            <div key={index}>
+            <div key={index} className="px-56 mx-auto">
               <Accordion
                 expanded={expanded === `panel${index + 1}`}
                 onChange={handleChange(`panel${index + 1}`)}
@@ -111,7 +111,9 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
                   aria-controls={`panel${index + 1}d-content`}
                   id="panel1d-header"
                 >
-                  <Typography>{bank.bank_name}</Typography>
+                  <Typography className="text-dark-purple font-semibold">
+                    {bank.bank_name}
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <div>

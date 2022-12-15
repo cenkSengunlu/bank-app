@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { styled } from "@mui/material/styles";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
@@ -7,11 +7,8 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
-import { BankType, InterestsType } from "../typings";
-import { useAppDispatch } from "../app/hooks";
-import InterestRow from "./InterestRow";
-import DeleteModal from "./DeleteModal";
-import { useFieldArray, useForm } from "react-hook-form";
+import { BankType } from "../typings";
+import { Box } from "@mui/material";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -31,18 +28,45 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
     {...props}
   />
 ))(({ theme }) => ({
+  display: "flex",
+  justfifyContent: "flex-start",
   backgroundColor:
     theme.palette.mode === "dark"
       ? "rgba(255, 255, 255, .05)"
       : "rgba(0, 0, 0, .03)",
-  flexDirection: "row-reverse",
+  flexDirection: "column",
   "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
-    transform: "rotate(90deg)",
+    transform: "rotate(0deg)",
   },
   "& .MuiAccordionSummary-content": {
     marginLeft: theme.spacing(1),
   },
 }));
+
+const CustomExpandIcon = () => {
+  return (
+    <Box
+      sx={{
+        ".Mui-expanded & > .collapsIconWrapper": {
+          display: "none",
+        },
+        ".expandIconWrapper": {
+          display: "none",
+        },
+        ".Mui-expanded & > .expandIconWrapper": {
+          display: "block",
+        },
+      }}
+    >
+      <div className="expandIconWrapper text-dark-purple font-semibold bg-secondary-purple py-1 px-5 rounded-full mt-1 mb-2">
+        Detayları Gizle
+      </div>
+      <div className="collapsIconWrapper text-dark-purple font-semibold bg-secondary-purple py-1 px-5 rounded-full mt-1 mb-2">
+        Detaylar İçin Tıkla
+      </div>
+    </Box>
+  );
+};
 
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -65,17 +89,6 @@ const CreditAccordion = ({
   creditName: string | undefined;
 }) => {
   const [expanded, setExpanded] = useState<string | false>("");
-  const [payback, setPayback] = useState<number>();
-
-  const monthlyInterest = (interest: number) => {
-    const value = (amount * interest * Number(timeName?.match(/\d+/))) / 1200;
-    setPayback(value);
-  };
-
-  const annualInterest = (interest: number) => {
-    const value = (amount * interest * Number(timeName?.match(/\d+/))) / 100;
-    setPayback(value);
-  };
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -99,6 +112,7 @@ const CreditAccordion = ({
               onChange={handleChange(`panel${index + 1}`)}
             >
               <AccordionSummary
+                expandIcon={<CustomExpandIcon />}
                 aria-controls={`panel${index + 1}d-content`}
                 id="panel1d-header"
               >

@@ -50,7 +50,19 @@ const banks = ({
         <BankAdd />
         {banks.data.length !== 0 ? (
           <div className="px-36">
-            <AccordionComp banks={banks.data} />
+            <AccordionComp
+              banks={banks.data.map((bank) => {
+                return {
+                  ...bank,
+                  interests: bank.interests.map((interest) => {
+                    return {
+                      ...interest,
+                      _id: interest.id,
+                    };
+                  }),
+                };
+              })}
+            />
           </div>
         ) : (
           <div className="w-full flex justify-center text-2xl font-semibold mt-5">
