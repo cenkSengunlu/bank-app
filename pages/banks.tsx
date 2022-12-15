@@ -46,8 +46,8 @@ const banks = ({
   }
   return (
     <div>
-      <BankAdd />
       <div className="container mx-auto">
+        <BankAdd />
         {banks.data.length !== 0 ? (
           <div className="px-36">
             <AccordionComp banks={banks.data} />

@@ -49,18 +49,33 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-const DepositAccordion = ({
+const CreditAccordion = ({
   bank,
   amount,
   time,
   timeName,
+  credit,
+  creditName,
 }: {
   bank: BankType;
   amount: number;
   time: number;
   timeName: string | undefined;
+  credit: number;
+  creditName: string | undefined;
 }) => {
   const [expanded, setExpanded] = useState<string | false>("");
+  const [payback, setPayback] = useState<number>();
+
+  const monthlyInterest = (interest: number) => {
+    const value = (amount * interest * Number(timeName?.match(/\d+/))) / 1200;
+    setPayback(value);
+  };
+
+  const annualInterest = (interest: number) => {
+    const value = (amount * interest * Number(timeName?.match(/\d+/))) / 100;
+    setPayback(value);
+  };
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -70,7 +85,14 @@ const DepositAccordion = ({
   return (
     <div className="w-4/6 mx-auto overflow-auto">
       {bank.interests.map((interest, index) => {
-        if (interest.time_option === time) {
+        if (interest.time_option === time && interest.credit_type === credit) {
+          const payback =
+            (amount * interest.interest * Number(timeName?.match(/\d+/))) /
+              credit ===
+            1
+              ? 100
+              : 1200;
+
           return (
             <Accordion
               expanded={expanded === `panel${index + 1}`}
@@ -82,24 +104,26 @@ const DepositAccordion = ({
               >
                 <Typography>
                   <div className="flex space-x-10">
-                    <div className="w-32 font-semibold">{bank.bank_name}</div>
+                    <div className="w-32 text-dark-purple font-semibold">
+                      {bank.bank_name}
+                    </div>
                     <div className="">
-                      Aylık Faiz Oranı %{interest.interest}
+                      Toplam Geri Ödeme: {payback + amount} TL
                     </div>
                   </div>
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <div className="w-full flex flex-col items-center">
-                  <div>Mevduat Tutarı: {amount} TL</div>
+                  <div>Hesaba Yatacak Tutar: {amount} TL</div>
                   <div>
-                    {timeName} vade sonra alınacak faiz tutarı:{" "}
-                    {(amount * interest.interest) / 100} TL
+                    {creditName} - {timeName} Vade -{" "}
+                    {credit === 1 ? "Yıllık" : "Aylık"} Faiz %
+                    {interest.interest}{" "}
                   </div>
                   <div>
-                    {" "}
-                    {timeName} vade sonra toplam mevduat:{" "}
-                    {(amount * interest.interest) / 100 + amount} TL
+                    {credit === 1 ? "Yıllık" : "Aylık"} Geri Ödeme:{" "}
+                    {(payback + amount) / Number(timeName?.match(/\d+/))} TL
                   </div>
                 </div>
               </AccordionDetails>
@@ -111,4 +135,4 @@ const DepositAccordion = ({
   );
 };
 
-export default DepositAccordion;
+export default CreditAccordion;

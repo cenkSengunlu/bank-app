@@ -121,6 +121,21 @@ export const addInterest: any = createAsyncThunk(
   }
 );
 
+//  ----------- INTEREST SİL -----------
+export const deleteInterest: any = createAsyncThunk(
+  "bank/deleteInterest",
+  async ({ id, bank_id }: { id: number; bank_id: number }) => {
+    return await axios
+      .delete("banks/", { data: { id: id, bank_id: bank_id } })
+      .then(function (response) {
+        return response.data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+);
+
 //  ----------- BANKA SİL -----------
 export const deleteBank: any = createAsyncThunk(
   "bank/deleteBank",

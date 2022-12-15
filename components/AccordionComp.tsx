@@ -12,6 +12,7 @@ import { useAppDispatch } from "../app/hooks";
 import InterestRow from "./InterestRow";
 import DeleteModal from "./DeleteModal";
 import { useFieldArray, useForm } from "react-hook-form";
+import BankAdd from "./BankAdd";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -70,6 +71,14 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
           interests: bank.interests,
         });
       });
+    } else if (watch("banks").length !== banks.length) {
+      const sortedBanks = [...banks];
+      sortedBanks.sort((a, b) => a.id - b.id);
+      append({
+        id: sortedBanks[sortedBanks.length - 1].id,
+        bank_name: sortedBanks[sortedBanks.length - 1].bank_name,
+        interests: sortedBanks[sortedBanks.length - 1].interests,
+      });
     }
   }, [append, banks, watch]);
 
@@ -79,7 +88,7 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
     };
 
   return (
-    <div className="overflow-auto">
+    <div>
       {isOpen && selectedBank && (
         <DeleteModal
           id={selectedBank.id}
@@ -89,35 +98,39 @@ export default function AccordionComp({ banks }: { banks: BankType[] }) {
           setIsOpen={setIsOpen}
         />
       )}
-      {fields.map((bank: any, index: number) => {
-        return (
-          <div key={index}>
-            <Accordion
-              expanded={expanded === `panel${index + 1}`}
-              onChange={handleChange(`panel${index + 1}`)}
-            >
-              <AccordionSummary
-                aria-controls={`panel${index + 1}d-content`}
-                id="panel1d-header"
+
+      <div>
+        {fields.map((bank: any, index: number) => {
+          return (
+            <div key={index}>
+              <Accordion
+                expanded={expanded === `panel${index + 1}`}
+                onChange={handleChange(`panel${index + 1}`)}
               >
-                <Typography>{bank.bank_name}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <div>
-                  <InterestRow
-                    ban
-                    rowIndex={index}
-                    control={control}
-                    watch={watch}
-                    register={register}
-                    bank={banks[index]}
-                  />
-                </div>
-              </AccordionDetails>
-            </Accordion>
-          </div>
-        );
-      })}
+                <AccordionSummary
+                  aria-controls={`panel${index + 1}d-content`}
+                  id="panel1d-header"
+                >
+                  <Typography>{bank.bank_name}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <div>
+                    <InterestRow
+                      rowIndex={index}
+                      control={control}
+                      watch={watch}
+                      register={register}
+                      bank={banks[index]}
+                      bankRemove={remove}
+                      setExpand={setExpanded}
+                    />
+                  </div>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

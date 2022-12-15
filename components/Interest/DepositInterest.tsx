@@ -29,7 +29,7 @@ const DepositInterest = ({ deposit }: { deposit: BankType[] }) => {
   const canSave = [time, amount].every((item) => item !== undefined);
   return (
     <div className="flex justify-center flex-col w-4/6 mx-auto">
-      <div className="w-full flex justify-center text-2xl font-semibold my-5">
+      <div className="w-full flex justify-center text-2xl font-semibold my-5 text-dark-purple">
         Mevduat Faizi Bul
       </div>
       <div className="w-4/5 mx-auto grid grid-cols-3 gap-5">
@@ -72,7 +72,6 @@ const DepositInterest = ({ deposit }: { deposit: BankType[] }) => {
             }}
           />
         </div>
-        {/* <div className="> */}
         <button
           disabled={!canSave}
           onClick={() =>
@@ -82,7 +81,6 @@ const DepositInterest = ({ deposit }: { deposit: BankType[] }) => {
         >
           Bul
         </button>
-        {/* </div> */}
       </div>
       <div className="mx-auto mt-10 w-full">
         {interest.time !== 0 &&
@@ -95,15 +93,21 @@ const DepositInterest = ({ deposit }: { deposit: BankType[] }) => {
                   bank={bank}
                   amount={Number(interest.amount)}
                   time={interest.time}
+                  timeName={
+                    list.deposit.time.find((item) => item.id === interest.time)
+                      ?.name
+                  }
                 />
               </div>
             );
           })}
-        {filteredBanks.length === 0 && (
-          <div className="text-center font-semibold text-xl text-dark-purple">
-            Bu vade için banka bulunamadı!
-          </div>
-        )}
+        {interest.time !== 0 &&
+          interest.amount !== 0 &&
+          filteredBanks.length === 0 && (
+            <div className="text-center font-semibold text-xl text-dark-purple">
+              Bu vade için banka bulunamadı!
+            </div>
+          )}
       </div>
     </div>
   );

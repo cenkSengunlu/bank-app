@@ -2,11 +2,19 @@ import React from "react";
 import { BankType, InterestsType } from "../typings";
 import { timeAndCredit } from "../timeAndCredit";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { addInterest } from "../slices/bank/bankSlice";
+import { addInterest, deleteBank } from "../slices/bank/bankSlice";
 import { FormControl, MenuItem, Select, TextField } from "@mui/material";
 import { useFieldArray } from "react-hook-form";
 
-const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
+const InterestRow = ({
+  rowIndex,
+  control,
+  watch,
+  register,
+  bank,
+  bankRemove,
+  setExpand,
+}: any) => {
   const dispatch = useAppDispatch();
   const list = timeAndCredit;
   const { fields, append, remove } = useFieldArray({
@@ -22,11 +30,24 @@ const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
     });
   };
 
+  const handleDelete = (bank: BankType) => {
+    bankRemove(rowIndex);
+    dispatch(deleteBank(bank.id));
+    setExpand("");
+  };
+
+  const handleInterestDelete = (index: number, interest: any) => {
+    console.log({ index, interest });
+    // dispatch(deleteInterest({interest.id, interest.bank_id}));
+    remove(index);
+  };
+
   const handleSave = (index: number) => {
     const interest = watch(`banks[${rowIndex}].interests[${index}]`);
     console.log(interest);
     dispatch(addInterest({ ...interest }));
   };
+  console.log(fields);
 
   return (
     <>
@@ -40,13 +61,13 @@ const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
           <button
             disabled={fields.length === 7}
             onClick={handleAppend}
-            className="cursor-pointer bg-blue-600 border-2 border-blue-700 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer bg-light-purple border-2  rounded-lg w-full h-10 flex justify-center items-center text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Faiz Ekle
           </button>
           <button
             onClick={() => {
-              // handleDelete(bank);
+              handleDelete(bank);
             }}
             className="cursor-pointer bg-red-500 border-2 border-red-600 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm"
           >
@@ -74,7 +95,15 @@ const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
               >
                 {Object.values(list).map((credit, credit_index) => {
                   return (
-                    <MenuItem value={credit.id} key={credit_index}>
+                    <MenuItem
+                      value={credit.id}
+                      key={credit_index}
+                      disabled={
+                        fields.filter(
+                          (val: any) => val.credit_type === credit.id
+                        ).length === credit.time.length
+                      }
+                    >
                       {credit.name}
                     </MenuItem>
                   );
@@ -91,7 +120,7 @@ const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
                 {...register(
                   `banks[${rowIndex}].interests[${index}].time_option`,
                   {
-                    required: "Kredi Tipi Seçiniz",
+                    required: "Vade Türü Seçiniz",
                   }
                 )}
                 inputProps={{ "aria-label": "Without label" }}
@@ -141,12 +170,12 @@ const InterestRow = ({ rowIndex, control, watch, register, bank }: any) => {
                   watch(`banks[${rowIndex}].interests[${index}].interest`) == 0
                 }
                 onClick={() => handleSave(index)}
-                className="cursor-pointer font-bold bg-green-600 border-2 border-green-700 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer font-bold bg-smooth-green border-2 border-green-600 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 KAYDET
               </button>
               <button
-                onClick={() => remove(index)}
+                onClick={() => handleInterestDelete(index, interest)}
                 className="cursor-pointer font-bold bg-red-500 border-2 border-red-600 rounded-lg w-full h-10 flex justify-center items-center text-white text-sm"
               >
                 SİL
