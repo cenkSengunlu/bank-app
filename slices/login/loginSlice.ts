@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios from "../../configs/axiosConfig";
 import { RootState } from "../../app/store";
 import Cookies from "js-cookie";
-
-const POST_URL = "http://localhost:81/api/login";
 
 interface LoggedInUserState {
   error: string | null;
@@ -18,16 +16,10 @@ const initialState: LoggedInUserState = {
 export const loginUser: any = createAsyncThunk(
   "login/loginUser",
   async ({ username, password }: { username: string; password: string }) => {
-    return await axios({
-      method: "post",
-      url: POST_URL,
-      data: { username: username, password: password },
-    })
+    return await axios
+      .post("login/", { username: username, password: password })
       .then(function (response) {
         return response.data;
-      })
-      .catch(function (err) {
-        console.log(err.message);
       });
   }
 );

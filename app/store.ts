@@ -1,13 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import loginReducer from "../slices/login/loginSlice";
-import registerReducer from "../slices/register/registerSlice";
 import bankReducer from "../slices/bank/bankSlice";
 import mainReducer from "../slices/main/mainSlice";
 
 export const store = configureStore({
   reducer: {
     login: loginReducer,
-    register: registerReducer,
     bank: bankReducer,
     main: mainReducer,
   },

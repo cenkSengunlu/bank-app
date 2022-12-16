@@ -9,7 +9,6 @@ import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import { BankType } from "../typings";
 import { Box } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
