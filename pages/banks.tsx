@@ -6,9 +6,10 @@ import BankAdd from "../components/BankAdd";
 import { BankType } from "../typings";
 import Cookies from "js-cookie";
 import AlertDialog from "../components/AlertDialog";
+import { GetServerSideProps } from "next/types";
 
-export async function getServerSideProps(test: any) {
-  const token = test.req.cookies.token;
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const token = context.req.cookies.token;
   return await axios
     .get("banks", {
       withCredentials: true,
@@ -32,7 +33,7 @@ export async function getServerSideProps(test: any) {
         },
       };
     });
-}
+};
 
 const banks = ({
   banks,
